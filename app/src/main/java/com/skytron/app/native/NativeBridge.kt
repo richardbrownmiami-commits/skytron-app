@@ -321,7 +321,9 @@ class NativeBridge(
         scope.launch {
             try {
                 db.appDao().put(KVEntry(table, key, value))
-            } catch (_: Exception) {}
+            } catch (e: Exception) {
+                // Ignore
+            }
         }
     }
 
@@ -330,7 +332,9 @@ class NativeBridge(
         scope.launch {
             try {
                 db.appDao().delete(table, key)
-            } catch (_: Exception) {}
+            } catch (e: Exception) {
+                // Ignore
+            }
         }
     }
 
@@ -339,7 +343,9 @@ class NativeBridge(
         scope.launch {
             try {
                 db.appDao().clearTable(table)
-            } catch (_: Exception) {}
+            } catch (e: Exception) {
+                // Ignore
+            }
         }
     }
 
@@ -349,7 +355,9 @@ class NativeBridge(
         scope.launch {
             try {
                 db.syncDao().insert(SyncItem(id, action, type, key, value, "pending", System.currentTimeMillis()))
-            } catch (_: Exception) {}
+            } catch (e: Exception) {
+                // Ignore
+            }
         }
         return id
     }
