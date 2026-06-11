@@ -23,7 +23,7 @@
     <application
         android:name=".SkytronApp"
         android:allowBackup="true"
-        android:icon="@mipmap/ic_launcher"
+        android:icon="@android:mipmap/sym_def_app_icon"
         android:label="Skytron"
         android:supportsRtl="true"
         android:theme="@style/Theme.Skytron"
