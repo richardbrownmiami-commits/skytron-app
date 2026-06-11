@@ -238,8 +238,11 @@ class NativeBridge(
     fun keepAwake(enable: Boolean) {
         try {
             activity.window.attributes = activity.window.attributes.apply {
-                if (enable) flags |= android.view.WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON
-                else flags = flags and android.view.WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON.inv()
+                if (enable) {
+                    flags = flags or android.view.WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON
+                } else {
+                    flags = flags and android.view.WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON.inv()
+                }
             }
         } catch (_: Exception) {}
     }
