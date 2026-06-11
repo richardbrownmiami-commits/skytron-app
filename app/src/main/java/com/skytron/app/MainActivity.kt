@@ -21,7 +21,7 @@ import androidx.core.content.ContextCompat
 import androidx.core.content.FileProvider
 import com.skytron.app.native.NativeBridge
 import java.io.File
-import java.io.SimpleDateFormat
+import java.text.SimpleDateFormat
 import java.util.*
 
 class MainActivity : AppCompatActivity() {
@@ -249,7 +249,7 @@ class MainActivity : AppCompatActivity() {
         <head>
             <meta name="viewport" content="width=device-width, initial-scale=1.0">
             <style>
-                body { margin:0; padding:20px; font-family:system-ui; background:#0a0a0f; color:#e4e4e7; display:flex; flex-direction:column; align-items:center; justify-content:center; min-height:100vh; }
+                body { margin:0; padding:20px; font-family:system-ui; background:#0a0a0f; color:#e4e4e7; display:flex; flex-direction:column; align-items:center; justify-content:center; min-heigh[...]
                 h1 { font-size:24px; margin-bottom:8px; }
                 p { color:#a1a1aa; text-align:center; }
             </style>
