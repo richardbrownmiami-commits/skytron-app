@@ -2,7 +2,7 @@
 # Gradle startup script for POSIX systems
 DIRNAME=$(dirname "$0")
 APP_BASE_NAME=$(basename "$0")
-DEFAULT_JVM_OPTS='"-Xmx64m" "-Xms64m"'
+DEFAULT_JVM_OPTS="-Xmx64m -Xms64m"
 MAX_FD="maximum"
 warn () { echo "$*"; }
 die () { echo "$*"; exit 1; }
