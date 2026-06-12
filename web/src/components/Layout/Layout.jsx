@@ -25,7 +25,7 @@ export default function Layout({ children }) {
   const isRtl = i18n.language === 'ar'
 
   return (
-    <div className="flex h-dvh overflow-hidden" dir={isRtl ? 'rtl' : 'ltr'} style={{ paddingTop: 'env(safe-area-inset-top)', paddingBottom: 'env(safe-area-inset-bottom)' }}>
+    <div className="flex h-screen overflow-hidden" dir={isRtl ? 'rtl' : 'ltr'} style={{ paddingTop: 'env(safe-area-inset-top)', paddingBottom: 'env(safe-area-inset-bottom)' }}>
       <aside className="hidden md:flex w-60 bg-[var(--color-bg-card)] border-r border-[var(--color-border)] flex-col shrink-0">
         <div className="p-4 border-b border-[var(--color-border)]">
           <h1 className="text-lg font-bold text-[var(--color-text)] flex items-center gap-2">
