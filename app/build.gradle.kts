@@ -46,6 +46,7 @@ android {
     sourceSets {
         getByName("main") {
             assets.srcDirs("src/main/assets")
+            res.srcDirs("src/main/res")
         }
     }
 }
@@ -64,4 +65,7 @@ dependencies {
     implementation("androidx.work:work-runtime-ktx:2.10.0")
 
     implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.7.3")
+    
+    // Add missing JSON dependency for SyncWorker
+    implementation("org.json:json:20240303")
 }
