@@ -2,16 +2,18 @@ import { defineConfig } from 'vite'
 import react from '@vitejs/plugin-react'
 import tailwindcss from '@tailwindcss/vite'
 
-function stripCrossorigin() {
+function fixFileProtocol() {
   return {
-    name: 'strip-crossorigin',
+    name: 'fix-file-protocol',
     transformIndexHtml(html) {
-      return html.replace(/ crossorigin/g, '')
+      return html
+        .replace(/ crossorigin/g, '')
+        .replace(/type="module"/g, 'defer')
     }
   }
 }
 
 export default defineConfig({
   base: './',
-  plugins: [react(), tailwindcss(), stripCrossorigin()],
+  plugins: [react(), tailwindcss(), fixFileProtocol()],
 })
