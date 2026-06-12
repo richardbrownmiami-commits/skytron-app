@@ -90,7 +90,7 @@ class MainActivity : AppCompatActivity() {
             allowFileAccess = true
             allowContentAccess = true
             databaseEnabled = true
-            cacheMode = WebSettings.LOAD_DEFAULT
+            cacheMode = WebSettings.LOAD_CACHE_ELSE_NETWORK
             mixedContentMode = WebSettings.MIXED_CONTENT_ALWAYS_ALLOW
             mediaPlaybackRequiresUserGesture = false
             setSupportMultipleWindows(false)
@@ -249,7 +249,7 @@ class MainActivity : AppCompatActivity() {
         <head>
             <meta name="viewport" content="width=device-width, initial-scale=1.0">
             <style>
-                body { margin:0; padding:20px; font-family:system-ui; background:#0a0a0f; color:#e4e4e7; display:flex; flex-direction:column; align-items:center; justify-content:center; min-heigh[...]
+                body { margin:0; padding:20px; font-family:system-ui; background:#0a0a0f; color:#e4e4e7; display:flex; flex-direction:column; align-items:center; justify-content:center; min-height:100vh; }
                 h1 { font-size:24px; margin-bottom:8px; }
                 p { color:#a1a1aa; text-align:center; }
             </style>
