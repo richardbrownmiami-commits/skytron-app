@@ -14,10 +14,11 @@
     <style>
       body { margin: 0; background: #0D1B2A; overflow: hidden; overscroll-behavior: none; }
       #root { height: 100vh; }
+      #loading { display:flex; align-items:center; justify-content:center; height:100vh; color:#7FB3CC; font-family:system-ui; font-size:14px; }
     </style>
   </head>
   <body>
-    <div id="root"></div>
+    <div id="root"><div id="loading">Loading Skytron...</div></div>
     <script type="module" src="/src/main.jsx"></script>
     <noscript><div style="color:#e4e4e7;background:#0D1B2A;padding:40px;text-align:center;font-family:sans-serif"><h1>Skytron</h1><p>JavaScript is required.</p></div></noscript>
   </body>
