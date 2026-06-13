@@ -94,10 +94,11 @@ class MainActivity : AppCompatActivity() {
             mixedContentMode = WebSettings.MIXED_CONTENT_ALWAYS_ALLOW
             mediaPlaybackRequiresUserGesture = false
             setSupportMultipleWindows(false)
-            loadWithOverviewMode = false
-            useWideViewPort = false
+            loadWithOverviewMode = true
+            useWideViewPort = true
             builtInZoomControls = false
             displayZoomControls = false
+            setInitialScale(1, false)
         }
 
         val assetLoader = WebViewAssetLoader.Builder()
