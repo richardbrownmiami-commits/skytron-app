@@ -94,8 +94,8 @@ class MainActivity : AppCompatActivity() {
             mixedContentMode = WebSettings.MIXED_CONTENT_ALWAYS_ALLOW
             mediaPlaybackRequiresUserGesture = false
             setSupportMultipleWindows(false)
-            loadWithOverviewMode = true
-            useWideViewPort = true
+            loadWithOverviewMode = false
+            useWideViewPort = false
             builtInZoomControls = false
             displayZoomControls = false
         }
