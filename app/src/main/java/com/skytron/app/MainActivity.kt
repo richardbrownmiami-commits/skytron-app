@@ -98,7 +98,9 @@ class MainActivity : AppCompatActivity() {
             useWideViewPort = true
             builtInZoomControls = false
             displayZoomControls = false
-            setInitialScale(1, false)
+        }
+
+        webView.setInitialScale(1, true)
         }
 
         val assetLoader = WebViewAssetLoader.Builder()
