@@ -20,14 +20,23 @@ if ('serviceWorker' in navigator) {
   })
 }
 
-try {
-  ReactDOM.createRoot(document.getElementById('root')).render(
-    <ErrorBoundary>
-      <Minimal />
-    </ErrorBoundary>
-  )
-} catch (e) {
-  console.error('RENDER ERROR:', e)
-  document.getElementById('root').innerHTML =
-    '<div style="color:red;padding:20px">Error: ' + e.message + '</div>'
+function mount() {
+  const root = document.getElementById('root')
+  if (!root) { console.error('ROOT NOT FOUND'); return }
+  try {
+    ReactDOM.createRoot(root).render(
+      <ErrorBoundary>
+        <Minimal />
+      </ErrorBoundary>
+    )
+  } catch (e) {
+    console.error('RENDER ERROR:', e.message)
+    root.innerHTML = '<div style="color:red;padding:20px">Error: ' + e.message + '</div>'
+  }
+}
+
+if (document.readyState === 'loading') {
+  document.addEventListener('DOMContentLoaded', mount)
+} else {
+  mount()
 }
