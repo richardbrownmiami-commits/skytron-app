@@ -21,13 +21,11 @@ if ('serviceWorker' in navigator) {
 
 try {
   ReactDOM.createRoot(document.getElementById('root')).render(
-    <React.StrictMode>
-      <ErrorBoundary>
-        <HashRouter>
-          <App />
-        </HashRouter>
-      </ErrorBoundary>
-    </React.StrictMode>
+    <ErrorBoundary>
+      <HashRouter>
+        <App />
+      </HashRouter>
+    </ErrorBoundary>
   )
 } catch (e) {
   console.error('RENDER ERROR:', e)
