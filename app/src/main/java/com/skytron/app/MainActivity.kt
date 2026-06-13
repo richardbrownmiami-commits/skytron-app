@@ -12,6 +12,7 @@ import android.os.Environment
 import android.provider.MediaStore
 import android.provider.Settings
 import android.webkit.*
+import androidx.webkit.WebViewAssetLoader
 import android.util.Log
 import android.widget.FrameLayout
 import androidx.activity.OnBackPressedCallback
@@ -68,7 +69,7 @@ class MainActivity : AppCompatActivity() {
 
         setupWebView()
         requestAllPermissions()
-        webView.loadUrl("file:///android_asset/index.html")
+        webView.loadUrl("https://appassets.androidplatform.net/index.html")
 
         onBackPressedDispatcher.addCallback(this, object : OnBackPressedCallback(true) {
             override fun handleOnBackPressed() {
@@ -87,7 +88,6 @@ class MainActivity : AppCompatActivity() {
         webView.settings.apply {
             javaScriptEnabled = true
             domStorageEnabled = true
-            allowFileAccess = true
             allowContentAccess = true
             databaseEnabled = true
             cacheMode = WebSettings.LOAD_CACHE_ELSE_NETWORK
@@ -100,12 +100,24 @@ class MainActivity : AppCompatActivity() {
             displayZoomControls = false
         }
 
+        val assetLoader = WebViewAssetLoader.Builder()
+            .addPathHandler("/", WebViewAssetLoader.AssetsPathHandler(this))
+            .build()
+
         webView.webViewClient = object : WebViewClient() {
+            override fun shouldInterceptRequest(
+                view: WebView, request: WebResourceRequest
+            ): WebResourceResponse? {
+                return assetLoader.shouldInterceptRequest(request.url)
+            }
+
             override fun shouldOverrideUrlLoading(view: WebView, request: WebResourceRequest): Boolean {
                 val url = request.url.toString()
                 if (url.startsWith("http://") || url.startsWith("https://")) {
-                    startActivity(Intent(Intent.ACTION_VIEW, Uri.parse(url)))
-                    return true
+                    if (!url.startsWith("https://appassets.androidplatform.net")) {
+                        startActivity(Intent(Intent.ACTION_VIEW, Uri.parse(url)))
+                        return true
+                    }
                 }
                 return false
             }
