@@ -100,7 +100,7 @@ class MainActivity : AppCompatActivity() {
             displayZoomControls = false
         }
 
-        webView.setInitialScale(1, true)
+        webView.setInitialScale(100)
 
         val assetLoader = WebViewAssetLoader.Builder()
             .addPathHandler("/", WebViewAssetLoader.AssetsPathHandler(this))
