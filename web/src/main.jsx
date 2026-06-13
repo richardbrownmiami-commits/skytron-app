@@ -3,7 +3,6 @@ import ReactDOM from 'react-dom/client'
 import { HashRouter } from 'react-router-dom'
 import './i18n'
 import ErrorBoundary from './components/ErrorBoundary'
-import Minimal from './minimal'
 import App from './App'
 import './index.css'
 
@@ -24,14 +23,17 @@ function mount() {
   const root = document.getElementById('root')
   if (!root) { console.error('ROOT NOT FOUND'); return }
   try {
+    console.log('APP MOUNTING...')
     ReactDOM.createRoot(root).render(
       <ErrorBoundary>
-        <Minimal />
+        <HashRouter>
+          <App />
+        </HashRouter>
       </ErrorBoundary>
     )
+    console.log('APP MOUNTED SUCCESSFULLY')
   } catch (e) {
     console.error('RENDER ERROR:', e.message)
-    root.innerHTML = '<div style="color:red;padding:20px">Error: ' + e.message + '</div>'
   }
 }
 
