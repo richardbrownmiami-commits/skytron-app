@@ -1,8 +1,12 @@
 const wrap = (bridge, fn, fallback) => {
-  if (!bridge || typeof bridge[fn] !== 'function') return fallback
+  if (!bridge || typeof bridge[fn] !== 'function') return (...args) => Promise.resolve(typeof fallback === 'function' ? fallback(...args) : fallback)
   return (...args) => {
-    try { return bridge[fn](...args) }
-    catch (e) { return typeof fallback === 'function' ? fallback(...args) : fallback }
+    try {
+      const r = bridge[fn](...args)
+      return r != null && typeof r.then === 'function' ? r : Promise.resolve(r)
+    } catch (e) {
+      return Promise.resolve(typeof fallback === 'function' ? fallback(...args) : fallback)
+    }
   }
 }
 
