@@ -7,7 +7,9 @@ import App from './App'
 import './index.css'
 
 window.onerror = (msg, url, line, col, err) => {
+  if (msg && msg.includes && msg.includes("Java bridge method")) return true
   console.error('GLOBAL ERROR:', msg, err?.stack)
+  return true
 }
 window.addEventListener('unhandledrejection', e => {
   console.error('UNHANDLED PROMISE:', e.reason?.stack || e.reason)
