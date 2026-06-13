@@ -3,6 +3,7 @@ import ReactDOM from 'react-dom/client'
 import { HashRouter } from 'react-router-dom'
 import './i18n'
 import ErrorBoundary from './components/ErrorBoundary'
+import Minimal from './minimal'
 import App from './App'
 import './index.css'
 
@@ -22,9 +23,7 @@ if ('serviceWorker' in navigator) {
 try {
   ReactDOM.createRoot(document.getElementById('root')).render(
     <ErrorBoundary>
-      <HashRouter>
-        <App />
-      </HashRouter>
+      <Minimal />
     </ErrorBoundary>
   )
 } catch (e) {
