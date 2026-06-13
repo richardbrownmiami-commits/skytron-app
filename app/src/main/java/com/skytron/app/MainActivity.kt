@@ -101,7 +101,6 @@ class MainActivity : AppCompatActivity() {
         }
 
         webView.setInitialScale(1, true)
-        }
 
         val assetLoader = WebViewAssetLoader.Builder()
             .addPathHandler("/", WebViewAssetLoader.AssetsPathHandler(this))
