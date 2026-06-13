@@ -20,8 +20,14 @@ web/dist/
 .DS_Store
 Thumbs.db
 
+# Build outputs
+app/build/
+
 # Logs
 *.txt
 
 # Archives
 *.zip
+
+# Credentials
+.credentials.json

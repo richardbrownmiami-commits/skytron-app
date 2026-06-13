@@ -1,32 +1,76 @@
-const bridge = window.AndroidBridge || {};
+const wrap = (bridge, fn, fallback) => {
+  if (!bridge || typeof bridge[fn] !== 'function') return fallback
+  return (...args) => {
+    try { return bridge[fn](...args) }
+    catch (e) { return typeof fallback === 'function' ? fallback(...args) : fallback }
+  }
+}
 
-export const useBridge = () => ({
-  requestPermission: bridge.reqPerm || (() => Promise.resolve(false)),
-  takePhoto: bridge.takePic || (() => Promise.resolve("")),
-  getLocation: bridge.getLoc || (() => Promise.resolve("")),
-  getDeviceInfo: bridge.getDev || (() => Promise.resolve("{}")),
-  startSTT: bridge.stt || (() => Promise.resolve("")),
-  pickFile: bridge.pickFile || (() => Promise.resolve("")),
-  saveFile: bridge.saveFile || ((n, d) => Promise.resolve("")),
-  readFile: bridge.readFile || ((p) => Promise.resolve("")),
-  kvGet: bridge.kvGet || ((k) => Promise.resolve("")),
-  kvSet: bridge.kvSet || ((k, v) => {}),
-  kvDel: bridge.kvDel || ((k) => {}),
-  getBattery: bridge.getBat || (() => Promise.resolve("-1")),
-  getNetwork: bridge.getNet || (() => Promise.resolve("unknown")),
-  getAppVersion: bridge.getVer || (() => Promise.resolve("unknown")),
-  vibrate: bridge.vibrate || ((d) => {}),
-  keepAwake: bridge.keepAwake || ((e) => {}),
-  setClipboard: bridge.setClip || ((t) => {}),
-  getClipboard: bridge.getClip || (() => Promise.resolve("")),
-  syncNow: bridge.syncNow || (() => Promise.resolve("false")),
-  speakText: bridge.speak || (() => {}),
-  notify: bridge.notify || (() => {}),
-  isAvailable: !!window.AndroidBridge,
-  dbGet: bridge.dbGet || ((t, k) => Promise.resolve("")),
-  dbSet: bridge.dbSet || ((t, k, v) => {}),
-  dbDel: bridge.dbDel || ((t, k) => {}),
-  dbClear: bridge.dbClear || ((t) => {}),
-  syncEnq: bridge.syncEnq || ((a, t, k, v) => Promise.resolve("")),
-  syncStat: bridge.syncStat || (() => Promise.resolve('{"pending":0,"failed":0}')),
-});
+export const useBridge = () => {
+  const bridge = typeof window !== 'undefined' ? window.AndroidBridge : null
+  const isAvailable = bridge !== null && typeof bridge.reqPerm === 'function'
+
+  if (!isAvailable) {
+    return {
+      isAvailable: false,
+      requestPermission: () => Promise.resolve(false),
+      takePhoto: () => Promise.resolve(""),
+      getLocation: () => Promise.resolve(""),
+      getDeviceInfo: () => Promise.resolve("{}"),
+      startSTT: () => Promise.resolve(""),
+      pickFile: () => Promise.resolve(""),
+      saveFile: () => Promise.resolve(""),
+      readFile: () => Promise.resolve(""),
+      kvGet: () => Promise.resolve(""),
+      kvSet: () => {},
+      kvDel: () => {},
+      getBattery: () => Promise.resolve("-1"),
+      getNetwork: () => Promise.resolve("unknown"),
+      getAppVersion: () => Promise.resolve("unknown"),
+      vibrate: () => {},
+      keepAwake: () => {},
+      setClipboard: () => {},
+      getClipboard: () => Promise.resolve(""),
+      syncNow: () => Promise.resolve("false"),
+      speakText: () => {},
+      notify: () => {},
+      dbGet: () => Promise.resolve(""),
+      dbSet: () => {},
+      dbDel: () => {},
+      dbClear: () => {},
+      syncEnq: () => Promise.resolve(""),
+      syncStat: () => Promise.resolve('{"pending":0,"failed":0}'),
+    }
+  }
+
+  return {
+    isAvailable: true,
+    requestPermission: wrap(bridge, 'reqPerm', () => Promise.resolve(false)),
+    takePhoto: wrap(bridge, 'takePic', () => Promise.resolve("")),
+    getLocation: wrap(bridge, 'getLoc', () => Promise.resolve("")),
+    getDeviceInfo: wrap(bridge, 'getDev', () => Promise.resolve("{}")),
+    startSTT: wrap(bridge, 'stt', () => Promise.resolve("")),
+    pickFile: wrap(bridge, 'pickFile', () => Promise.resolve("")),
+    saveFile: wrap(bridge, 'saveFile', () => Promise.resolve("")),
+    readFile: wrap(bridge, 'readFile', () => Promise.resolve("")),
+    kvGet: wrap(bridge, 'kvGet', () => Promise.resolve("")),
+    kvSet: wrap(bridge, 'kvSet', () => {}),
+    kvDel: wrap(bridge, 'kvDel', () => {}),
+    getBattery: wrap(bridge, 'getBat', () => Promise.resolve("-1")),
+    getNetwork: wrap(bridge, 'getNet', () => Promise.resolve("unknown")),
+    getAppVersion: wrap(bridge, 'getVer', () => Promise.resolve("unknown")),
+    vibrate: wrap(bridge, 'vibrate', () => {}),
+    keepAwake: wrap(bridge, 'keepAwake', () => {}),
+    setClipboard: wrap(bridge, 'setClip', () => {}),
+    getClipboard: wrap(bridge, 'getClip', () => Promise.resolve("")),
+    syncNow: wrap(bridge, 'syncNow', () => Promise.resolve("false")),
+    speakText: wrap(bridge, 'speak', () => {}),
+    notify: wrap(bridge, 'notify', () => {}),
+    dbGet: wrap(bridge, 'dbGet', () => Promise.resolve("")),
+    dbSet: wrap(bridge, 'dbSet', () => {}),
+    dbDel: wrap(bridge, 'dbDel', () => {}),
+    dbClear: wrap(bridge, 'dbClear', () => {}),
+    syncEnq: wrap(bridge, 'syncEnq', () => Promise.resolve("")),
+    syncStat: wrap(bridge, 'syncStat', () => Promise.resolve('{"pending":0,"failed":0}')),
+  }
+}
