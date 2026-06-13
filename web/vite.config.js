@@ -6,9 +6,7 @@ function fixFileProtocol() {
   return {
     name: 'fix-file-protocol',
     transformIndexHtml(html) {
-      return html
-        .replace(/ crossorigin/g, '')
-        .replace(/type="module"/g, 'defer')
+      return html.replace(/ crossorigin/g, '')
     }
   }
 }
