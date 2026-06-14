@@ -2,9 +2,123 @@ import { useState, useEffect, useRef, useCallback } from 'react'
 import { useSettings } from '../context/SettingsContext'
 import { sendChatMessage, streamChatResponse } from '../services/gateway'
 import { loadConversations, saveConversations, generateId } from '../services/storage'
+import { useBridge } from './useBridge'
+
+const ACTIVE_ID_KEY = 'saraha-active-id'
+
+function loadActiveId() {
+  try { return localStorage.getItem(ACTIVE_ID_KEY) } catch { return null }
+}
+
+function saveActiveId(id) {
+  try { if (id) localStorage.setItem(ACTIVE_ID_KEY, id); else localStorage.removeItem(ACTIVE_ID_KEY) } catch {}
+}
+
+const TOOL_RE = /TOOL:(\w+)\|({[^}]+})/g
+
+const TOOL_BRIDGE_MAP = {
+  get_location: 'getLocation',
+  take_photo: 'takePhoto',
+  take_screenshot: 'takeScreenshot',
+  read_screen: 'readScreen',
+  open_app: 'openApp',
+  get_reminders: 'getReminders',
+  set_timer: 'setTimer',
+  set_reminder: 'setReminder',
+}
+
+async function executeTool(name, args, bridge) {
+  const bridgeName = TOOL_BRIDGE_MAP[name]
+  if (bridgeName && typeof bridge[bridgeName] === 'function') {
+    try {
+      const result = await bridge[bridgeName](...Object.values(args || {}))
+      return { success: true, result }
+    } catch (e) {
+      return { success: false, error: e.message }
+    }
+  }
+  if (name === 'web_search') {
+    try {
+      const query = args?.query || JSON.stringify(args)
+      const url = `https://api.duckduckgo.com/?q=${encodeURIComponent(query)}&format=json&no_html=1`
+      const res = await fetch(url)
+      const data = await res.json()
+      return { success: true, result: data.AbstractText || data.RelatedTopics?.slice(0, 3).map(t => t.Text).join('\n') || 'No results' }
+    } catch (e) {
+      return { success: false, error: e.message }
+    }
+  }
+  if (name === 'generate_image') {
+    return { success: false, error: 'Image generation not available on this device' }
+  }
+  if (name === 'report_failure') {
+    console.warn('[Tool Failure]', args)
+    return { success: true, result: 'Reported' }
+  }
+  return { success: false, error: `Tool "${name}" is not available on this device` }
+}
+
+async function executeToolCalls(text, bridge, currentMessages, convId, setMessages, updateMessages, updateConversationTitle, conversations, settings, content) {
+  const toolCalls = []
+  let match
+  while ((match = TOOL_RE.exec(text)) !== null) {
+    try {
+      toolCalls.push({ name: match[1], args: JSON.parse(match[2]) })
+    } catch {}
+  }
+  if (toolCalls.length === 0) return false
+
+  const results = []
+  for (const tc of toolCalls) {
+    const observation = await executeTool(tc.name, tc.args, bridge)
+    results.push({ tool: tc.name, args: tc.args, ...observation })
+  }
+
+  let toolResultText = results.map(r =>
+    `Tool ${r.tool} result: ${r.success ? r.result : 'Error: ' + r.error}`
+  ).join('\n')
+
+  const toolMsg = { id: generateId(), role: 'tool', content: toolResultText, createdAt: new Date().toISOString() }
+  currentMessages = [...currentMessages, toolMsg]
+  setMessages(currentMessages)
+  updateMessages(convId, currentMessages)
+
+  const chatMessages = [
+    { role: 'system', content: 'You are Skytron. The tool returned: ' + toolResultText + '. Continue your response naturally.' },
+    ...currentMessages.map(m => ({ role: m.role, content: m.content }))
+  ]
+
+  try {
+    const response = await sendChatMessage({
+      apiKey: settings.apiKey,
+      gatewayUrl: settings.gatewayUrl,
+      model: settings.model,
+      temperature: settings.temperature,
+      maxTokens: settings.maxTokens,
+      stream: false,
+      messages: chatMessages,
+    })
+    const data = await response.json()
+    const fullContent = data.choices?.[0]?.message?.content || ''
+    const assistantMsg = { id: generateId(), role: 'assistant', content: fullContent, createdAt: new Date().toISOString() }
+    currentMessages = [...currentMessages, assistantMsg]
+    setMessages(currentMessages)
+    updateMessages(convId, currentMessages)
+    if (conversations.find(c => c.id === convId)?.title === 'New Chat') {
+      updateConversationTitle(convId, content.slice(0, 40) + (content.length > 40 ? '...' : ''))
+    }
+  } catch (err) {
+    const errMsg = { id: generateId(), role: 'assistant', content: 'Tool execution error: ' + err.message, createdAt: new Date().toISOString() }
+    currentMessages = [...currentMessages, errMsg]
+    setMessages(currentMessages)
+    updateMessages(convId, currentMessages)
+  }
+  return true
+}
 
 export function useChat() {
   const { settings } = useSettings()
+  const bridge = useBridge()
   const [conversations, setConversations] = useState(loadConversations)
   const [activeId, setActiveId] = useState(null)
   const [messages, setMessages] = useState([])
@@ -14,6 +128,17 @@ export function useChat() {
   const abortRef = useRef(null)
 
   useEffect(() => { saveConversations(conversations) }, [conversations])
+
+  useEffect(() => { saveActiveId(activeId) }, [activeId])
+
+  useEffect(() => {
+    const savedId = loadActiveId()
+    if (savedId && conversations.find(c => c.id === savedId)) {
+      setActiveId(savedId)
+      const conv = conversations.find(c => c.id === savedId)
+      setMessages(conv.messages)
+    }
+  }, [])
 
   const getConversation = useCallback((id) => {
     return conversations.find(c => c.id === id)
@@ -139,6 +264,14 @@ You have a brain worker at https://saraha-brain.richard-brown-miami.workers.dev.
       for await (const token of streamChatResponse(response)) {
         fullContent += token
         setStreamingContent(fullContent)
+      }
+      
+      // Parse and execute tool calls from the response
+      const hadTools = await executeToolCalls(fullContent, bridge, updatedMessages, convId, setMessages, updateMessages, updateConversationTitle, conversations, settings, content)
+      if (hadTools) {
+        setIsStreaming(false)
+        setStreamingContent('')
+        return
       }
 
       if (controller.signal.aborted) {
